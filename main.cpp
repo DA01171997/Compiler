@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <vector>
 
 using namespace std;
 
@@ -11,7 +12,7 @@ int main(){
 	ifstream inFile;
 	int tempHead;
 	int tempTail;
-	bool flag=false;
+	bool comment=false;
 	 try {
         inFile.open("final.txt"); 
 		outFile.open("part1.txt", ofstream::out);
@@ -22,25 +23,22 @@ int main(){
     catch (std::runtime_error &e) {                               
         cout << e.what() << endl;
     }
-    while (!inFile.eof()) {
-		outFile<<"hello"<<endl;
-		getline(inFile, line);
-		for(int i =0; i< line.length(); i++) {
-			if(line[i]=='(') {
-				if (line[i+1]=='*'){
-				flag=true;
-				}
+    while (getline(inFile, line)) {
+		vector<char> vec(line.c_str(), line.c_str() + line.size() + 1);
+		string input;
+		for (int i = 0; i < vec.size(); i++) {
+			if(vec[i] == '(' && vec[i+1] =='*'){
+				comment = true;
 			}
-			else if(line[i]=='*') {
-				if (line[i+1]==')'){
-				flag=false;
-				}
+			if(!comment){
+				outFile<<vec[i];
 			}
-			if(!flag) {
-			outFile<<line[i];
+			if(vec[i] == '*' && vec[i+1] ==')'){
+				comment = false;
+				i++;
 			}
 		}
-		
+		if(!comment){outFile<<endl;}
 	}
 	outFile.close();
 	inFile.close();
