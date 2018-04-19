@@ -11,7 +11,7 @@ int main(){
 	ifstream inFile;
 	int tempHead;
 	int tempTail;
-	bool flag=false;
+	bool comment=false;
 	 try {
         inFile.open("final.txt"); 
 		outFile.open("part1.txt", ofstream::out);
@@ -23,23 +23,24 @@ int main(){
         cout << e.what() << endl;
     }
     while (!inFile.eof()) {
-		outFile<<"hello"<<endl;
 		getline(inFile, line);
 		for(int i =0; i< line.length(); i++) {
 			if(line[i]=='(') {
 				if (line[i+1]=='*'){
-				flag=true;
+				comment=true;
 				}
 			}
-			else if(line[i]=='*') {
-				if (line[i+1]==')'){
-				flag=false;
-				}
-			}
-			if(!flag) {
+			if(!comment) {
 			outFile<<line[i];
 			}
+			if(line[i]=='*') {
+				if (line[i+1]==')'){
+				comment=false;
+				i++;
+				}
+			}
 		}
+		if(!comment){outFile<<endl;}
 		
 	}
 	outFile.close();
