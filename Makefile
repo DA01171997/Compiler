@@ -1,5 +1,12 @@
-all: program1
-program1:
-	g++ main.cpp -std=c++11 -o main.exe
-clean:
-	rm *.exe
+lang: lex.yy.c y.tab.c
+	g++ -g lex.yy.c y.tab.c -o lang
+
+lex.yy.c: y.tab.c lang.l
+	lex lang.l
+
+y.tab.c: lang.y
+	yacc -d lang.y
+
+clean: 
+	rm -rf lex.yy.c y.tab.c y.tab.h lang lang.dSYM
+
