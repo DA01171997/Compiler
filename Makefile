@@ -1,3 +1,6 @@
+main: main.cpp
+	g++ main.cpp -o main.exe -std=c++11
+
 lang: lex.yy.c y.tab.c
 	g++ -g lex.yy.c y.tab.c -o lang
 
