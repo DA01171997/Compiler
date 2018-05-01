@@ -1,3 +1,4 @@
+default: main lang
 main: main.cpp
 	g++ main.cpp -o main.exe -std=c++11
 
