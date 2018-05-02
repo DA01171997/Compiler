@@ -5,12 +5,14 @@ int yylex();
 #include <ctype.h>
 #include <iostream>
 #include <string>
+#include <fstream>
 using namespace std;
 void yyerror (string message);
 int symbols[52];
 int hashh(char * a);
 void updateTable(char * symbol, int val);
 int symbolVal(char * symbol);
+fstream outFile;
 %}
 
 %union {int num; char * id;}
@@ -24,8 +26,11 @@ $token EQUAL
 %token SEMICOLON
 %token COLON
 %token COMMA
-%token STRING
+%token OSQUOTE
+%token CSQUOTE
 %token INTEGER
+%token OPENPER
+%token CLOSEPER
 %token <id> identifier
 %token <num> number
 %type <num> line
@@ -33,11 +38,23 @@ $token EQUAL
 %type <num> expr
 %type <num> term
 %type <num> factor
+%type <num> output;
+
+ 
 
 %%
 line	:	PROGRAM pname SEMICOLON VAR declist SEMICOLON BEGIN statlist {cout<<"asd"<<endl;}	
 		;
-pname	:	identifier					{cout<<"pname"<<endl;}
+pname	:	identifier					{cout<<"pname "<< $1<<endl;
+										char * temp = $1;
+										string temp2 = string(temp);
+										temp2.append(".cpp");
+										cout<<temp2<<endl;
+										outFile.open(temp2.c_str());
+										outFile<<"#include<iostream>";
+										outFile<<"using namespacestd;";
+										outFile.close();
+										}
 		;
 declist	:	dec COLON type				{cout<<"after INTEGER"<<endl;}
 		;
@@ -51,13 +68,13 @@ statlist:	stat SEMICOLON				{cout<<"statlist"<<endl;}
 stat	:	print						{cout<<"statprint"<<endl;}
 		|	assign						{cout<<"statassign"<<endl;}
 		;
-print	:	PRINT '(' output ')'		{cout<<"PRINT"<<endl;}
+print	:	PRINT OPENPER output CLOSEPER		{cout<<"PRINT"<<endl;}
 		;
-output	|	STRING COMMA identifier 	{cout<<"output"<<endl;}
-		|	identifier					{cout<<"output"<<endl;}
-		|	STRING						{;}
+output	: OSQUOTE CSQUOTE				{cout<<"output4"<<endl;}
+		| expr							{cout<<"output5"<<endl;}
+		| expr COMMA output				{cout<<"output6"<<endl;}
 		;
-assign	:	identifier EQUAL expr			{updateTable($1,$3);
+assign	:	identifier EQUAL expr		{updateTable($1,$3);
 										cout<<"assign"<<endl;
 										}
 		;
@@ -79,6 +96,8 @@ type	:	INTEGER						{;}
 int main (void) {
 return yyparse ();
 }
+
+
 void yyerror (string message) {cout<<message<<endl;}
 int hashh(char * a) {
 	int index = 0;
