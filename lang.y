@@ -20,7 +20,7 @@ fstream outFile;
 %token PROGRAM
 %token VAR
 %token BEGIN
-%TOKEN PRINT
+%token PRINT
 %token END
 $token EQUAL
 %token SEMICOLON
@@ -31,6 +31,10 @@ $token EQUAL
 %token INTEGER
 %token OPENPER
 %token CLOSEPER
+%token ADD
+%token MINUS
+%token MULTI
+%token DIVIDE
 %token <id> identifier
 %token <num> number
 %type <num> line
@@ -38,12 +42,13 @@ $token EQUAL
 %type <num> expr
 %type <num> term
 %type <num> factor
-%type <num> output;
+%type <num> output
+%token <id> STRING
 
  
 
 %%
-line	:	PROGRAM pname SEMICOLON VAR declist SEMICOLON BEGIN statlist {cout<<"asd"<<endl;}	
+line	:	PROGRAM pname SEMICOLON VAR declist SEMICOLON BEGIN statlist END {cout<<"asd"<<endl;}	
 		;
 pname	:	identifier					{cout<<"pname "<< $1<<endl;
 										char * temp = $1;
@@ -53,7 +58,7 @@ pname	:	identifier					{cout<<"pname "<< $1<<endl;
 										outFile.open(temp2.c_str());
 										outFile<<"#include<iostream>";
 										outFile<<"using namespacestd;";
-										outFile.close();
+										
 										}
 		;
 declist	:	dec COLON type				{cout<<"after INTEGER"<<endl;}
@@ -63,30 +68,32 @@ dec		:	identifier COMMA dec		{cout<<"dec"<<endl;}
 		;
 
 statlist:	stat SEMICOLON				{cout<<"statlist"<<endl;}
-		|	stat SEMICOLON statlist		{cout<<"statlist"<<endl;}
+		|	stat SEMICOLON statlist		{cout<<"statlist2"<<endl;}
 		;
 stat	:	print						{cout<<"statprint"<<endl;}
 		|	assign						{cout<<"statassign"<<endl;}
 		;
 print	:	PRINT OPENPER output CLOSEPER		{cout<<"PRINT"<<endl;}
 		;
-output	: OSQUOTE CSQUOTE				{cout<<"output4"<<endl;}
-		| expr							{cout<<"output5"<<endl;}
+output	: expr							{cout<<"output5"<<endl;}
 		| expr COMMA output				{cout<<"output6"<<endl;}
+		| STRING						{cout<<"output7"<<endl;}
+		| STRING COMMA expr				{cout<<"output8"<<endl;}
 		;
 assign	:	identifier EQUAL expr		{updateTable($1,$3);
 										cout<<"assign"<<endl;
+										cout<<"assignID="<< $1<<"expr="<< $3<<endl;
 										}
 		;
-expr	:	term						{$$ = $1;}
-		|	expr '+' term				{$$ = $1 + $3;}
-		|	expr '-' term				{$$ = $1 - $3;}
+expr	:	term						{$$ = $1;cout<<"exprTerm$1="<< $1<<"$$1="<< $$<<endl;}
+		|	expr ADD term				{$$ = $1 + $3;}
+		|	expr MINUS term				{$$ = $1 - $3;}
 		;
-term	:	term '*' factor				{$$ = $1 * $3;}
-		|	term '/' factor				{$$ = $1 / $3;}
+term	:	term MULTI factor			{$$ = $1 * $3; cout<<"$1="<< $1 <<"$3="<<$3<<"$$="<<$$<<endl;}
+		|	term DIVIDE factor			{$$ = $1 / $3;}
 		|	factor						{$$ = $1;}
 		;
-factor	:	identifier					{cout<<"here at factorIdentifier"<<endl; $$ = symbolVal($1);}
+factor	:	identifier					{cout<<"here at factorIdentifier"<<endl; $$ = symbolVal($1); cout<<"$1=" <<$1<<"symbolVal($1)"<<symbolVal($1)<<"$$="<<$$<<endl;}
 		|	'(' expr ')'				{cout<<"see factorExpression"<<endl;}
 		|	number						{cout<<" here at factor"<<$1<<" "<<$$<<endl; $$ = $1;}
 		;
@@ -94,7 +101,11 @@ type	:	INTEGER						{;}
 		;
 %%
 int main (void) {
+for (int i =0; i<52; i++){
+	symbols[i]=0;
+}
 return yyparse ();
+outFile.close();
 }
 
 

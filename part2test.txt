@@ -2,8 +2,6 @@ PROGRAM aba13;
 VAR
 ab5, cb, be, eb : INTEGER;
 BEGIN
-ab5 = 5;
-cb = 10;
-PRINT(‘’);
-PRINT(ab5);
-PRINT(ab5,adfadfa, dafafd);
+ab5 =3;
+be = 2 * ab5;
+END.
