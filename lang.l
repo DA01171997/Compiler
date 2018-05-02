@@ -18,6 +18,7 @@ int yylex();
 ([A-Za-z_])([A-Za-z0-9_])*				 	 {yylval.id = yytext; return identifier;}
 [0-9]+                                       {yylval.num= atoi(yytext); cout<<"number found"<<endl; return number;}
 [ \t\n]                						 ;
+=                                            {return EQUAL;}
 '.*'                                         {return STRING;}
 ;											 {return SEMICOLON;}
 :                                            {return COLON;}

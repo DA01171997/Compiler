@@ -20,6 +20,7 @@ int symbolVal(char * symbol);
 %token BEGIN
 %TOKEN PRINT
 %token END
+$token EQUAL
 %token SEMICOLON
 %token COLON
 %token COMMA
@@ -56,7 +57,7 @@ output	|	STRING COMMA identifier 	{cout<<"output"<<endl;}
 		|	identifier					{cout<<"output"<<endl;}
 		|	STRING						{;}
 		;
-assign	:	identifier '=' expr			{updateTable($1,$3);
+assign	:	identifier EQUAL expr			{updateTable($1,$3);
 										cout<<"assign"<<endl;
 										}
 		;
