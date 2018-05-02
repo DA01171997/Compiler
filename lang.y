@@ -42,7 +42,7 @@ pname	:	identifier					{cout<<"pname"<<endl;}
 declist	:	dec COLON type				{cout<<"after INTEGER"<<endl;}
 		;
 dec		:	identifier COMMA dec		{cout<<"dec"<<endl;}
-		|	identifier
+		|	identifier					{cout<<"decIdentifier"<<endl;}
 		;
 
 statlist:	stat SEMICOLON				{cout<<"statlist"<<endl;}
