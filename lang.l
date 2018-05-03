@@ -1,12 +1,19 @@
 %{
-#include "y.tab.h"
+
 #include <stdlib.h>
 #include <iostream>
 #include <string>
+#include "y.tab.h"
 using std::string;
 using namespace std;
 void yyerror (string s);
 int yylex();
+char * temp;
+char * temp2;
+char * cstr;
+char * temppp;
+char * temppp2;
+char * cstrrr;
 bool flag=false;
 %}
 
@@ -14,25 +21,33 @@ bool flag=false;
 "PROGRAM"									 {return PROGRAM;}
 "VAR"										 {return VAR;}
 "BEGIN"                                      {return BEGIN;}
-END\.                                        {cout<<"ENDfound"<<endl; return END;}
+END\.                                        {return END;}
 "PRINT"                                      {return PRINT;}
 "INTEGER"                                    {return INTEGER;}
-([A-Za-z_])([A-Za-z0-9_])*				     {yylval.id = yytext;cout<<"identifier found"<<endl; return identifier;}
-[0-9]+                                       {yylval.num= atoi(yytext); cout<<"number found"<<endl; return number;}
+([A-Za-z_])([A-Za-z0-9_])*				     {temp=yytext; 					
+											 string str(temp);
+											 cstr = new char[str.length() + 1];
+						                     strcpy(cstr, str.c_str());
+						                     temp2=cstr; yylval.id=temp2; return identifier;}
+[0-9]+                                       {yylval.num= atoi(yytext); return number;}
 [ \t\n]                						 ;
-=                                            {cout<<"EQUALfound"<<endl; return EQUAL;}
-\(											 {cout<<"OPENPERfound"<<endl; return OPENPER;}
-\)											 {cout<<"CLOSEPER found"<<endl; return CLOSEPER;}
-\‘											 {cout<<"OSQUOTE found"<<endl; return OSQUOTE;}
-\’											 {cout<<"CSQUOTE found"<<endl; return CSQUOTE;}
+=                                            {return EQUAL;}
+\(											 {return OPENPER;}
+\)											 {return CLOSEPER;}
+\‘											 {return OSQUOTE;}
+\’											 {return CSQUOTE;}
 ;											 {return SEMICOLON;}
 :                                            {return COLON;}
 ,                                            {return COMMA;}
-[+]           	   						     {cout<<"ADDfound"<<endl; return ADD;}
-[-]           	   						 	 {cout<<"MINUSfound"<<endl; return MINUS;}
-[*]           	   						     {cout<<"MULTIfound"<<endl; return MULTI;}
-[/]           	   						     {cout<<"DIVIDEfound"<<endl; return DIVIDE;}
-(‘.+\’)                                      {yylval.id = yytext;cout<<"string found"<<endl; return STRING;}
-.						                     {if(flag){cout<<"flag true"<<endl;yylval.id = yytext;cout<<"string found"<<endl; return STRING;} else {ECHO; yyerror("unexpected character");}}
+[+]           	   						     {return ADD;}
+[-]           	   						 	 {return MINUS;}
+[*]           	   						     {return MULTI;}
+[/]           	   						     {return DIVIDE;}
+(‘.+\’)                                      {temppp=yytext;
+											  string str2(temppp);
+										      cstrrr = new char[str2.length() +1];
+											  strcpy(cstrrr, str2.c_str());
+											  temppp2=cstrrr; yylval.id=temppp2; return STRING;}
+.						                     {ECHO; yyerror("unexpected character");}
 %%
-int yywrap (void) 		                     {return 1;}
+int yywrap (void) 		                     {delete [] cstr; delete [] cstrrr; return 1;}

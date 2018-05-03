@@ -13,6 +13,10 @@ int hashh(char * a);
 void updateTable(char * symbol, int val);
 int symbolVal(char * symbol);
 fstream outFile;
+char * temP;
+char * temP2;
+string tempStr;
+string tempStr2;
 %}
 
 %union {int num; char * id;}
@@ -42,7 +46,7 @@ $token EQUAL
 %type <num> expr
 %type <num> term
 %type <num> factor
-%type <num> output
+%type <id> output
 %token <id> STRING
 
  
@@ -61,41 +65,42 @@ pname	:	identifier					{cout<<"pname "<< $1<<endl;
 										
 										}
 		;
-declist	:	dec COLON type				{cout<<"after INTEGER"<<endl;}
+declist	:	dec COLON type				{;}
 		;
-dec		:	identifier COMMA dec		{cout<<"dec"<<endl;}
-		|	identifier					{cout<<"decIdentifier"<<endl;}
+dec		:	identifier COMMA dec		{;}
+		|	identifier					{;}
 		;
 
-statlist:	stat SEMICOLON				{cout<<"statlist"<<endl;}
-		|	stat SEMICOLON statlist		{cout<<"statlist2"<<endl;}
+statlist:	stat SEMICOLON				{;}
+		|	stat SEMICOLON statlist		{;}
 		;
-stat	:	print						{cout<<"statprint"<<endl;}
-		|	assign						{cout<<"statassign"<<endl;}
+stat	:	print						{;}
+		|	assign						{;}
 		;
-print	:	PRINT OPENPER output CLOSEPER		{cout<<"PRINT"<<endl;}
+print	:	PRINT OPENPER output CLOSEPER		{;}
 		;
-output	: expr							{cout<<"output5"<<endl;}
-		| expr COMMA output				{cout<<"output6"<<endl;}
-		| STRING						{cout<<"output7"<<endl;}
-		| STRING COMMA expr				{cout<<"output8"<<endl;}
-		;
-assign	:	identifier EQUAL expr		{updateTable($1,$3);
-										cout<<"assign"<<endl;
-										cout<<"assignID="<< $1<<"expr="<< $3<<endl;
+output	: expr							{tempStr=to_string($1);
+										temP = new char [tempStr.length()+1];
+										strcpy(temP, tempStr.c_str());
+										$$=temP;
 										}
+		| expr COMMA output				{;}
+		| STRING						{;}
+		| STRING COMMA expr				{ cout<<$1<<$3<<endl;}
 		;
-expr	:	term						{$$ = $1;cout<<"exprTerm$1="<< $1<<"$$1="<< $$<<endl;}
+assign	:	identifier EQUAL expr		{updateTable($1,$3);}
+		;
+expr	:	term						{$$ = $1;}
 		|	expr ADD term				{$$ = $1 + $3;}
 		|	expr MINUS term				{$$ = $1 - $3;}
 		;
-term	:	term MULTI factor			{$$ = $1 * $3; cout<<"$1="<< $1 <<"$3="<<$3<<"$$="<<$$<<endl;}
+term	:	term MULTI factor			{$$ = $1 * $3;}
 		|	term DIVIDE factor			{$$ = $1 / $3;}
 		|	factor						{$$ = $1;}
 		;
-factor	:	identifier					{cout<<"here at factorIdentifier"<<endl; $$ = symbolVal($1); cout<<"$1=" <<$1<<"symbolVal($1)"<<symbolVal($1)<<"$$="<<$$<<endl;}
-		|	'(' expr ')'				{cout<<"see factorExpression"<<endl;}
-		|	number						{cout<<" here at factor"<<$1<<" "<<$$<<endl; $$ = $1;}
+factor	:	identifier					{$$ = symbolVal($1);}
+		|	'(' expr ')'				{;}
+		|	number						{$$ = $1;}
 		;
 type	:	INTEGER						{;}
 		;
@@ -104,6 +109,7 @@ int main (void) {
 for (int i =0; i<52; i++){
 	symbols[i]=0;
 }
+delete [] temP;
 return yyparse ();
 outFile.close();
 }
