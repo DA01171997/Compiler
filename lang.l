@@ -30,7 +30,7 @@ string breakIt(string a);
 "PROGRAM"									{flag = true;return PROGRAM;}
 "VAR"										{VARFlag = true; return VAR;}
 "BEGIN"                                     {VARFlag = false; BEGINFlag = true; return BEGIN;}
-"END"                                       {outputFile<<"return 0;\n";yywrap(); return END;}
+"END\."                                       {outputFile<<"return 0;\n";yywrap(); return END;}
 "PRINT"                                     {outputFile<<"cout << ";
 											PRINTFlag = true;
 											return PRINT;

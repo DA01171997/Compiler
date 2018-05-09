@@ -17,6 +17,8 @@ char * temP;
 char * temP2;
 string tempStr;
 string tempStr2;
+bool valid = true;
+bool alreadySmells = false;
 %}
 
 %union {int num; char * id;}
@@ -51,29 +53,28 @@ $token EQUAL
 %token <id> STRING
 
 %%
-line	:	PROGRAM pname SEMICOLON VAR declist SEMICOLON BEGIN statlist END PERIOD {cout<<endl<<"VALID LANUAGE"<<endl;}	
-		|	error pname SEMICOLON VAR declist SEMICOLON BEGIN statlist END PERIOD		{cout<<"PROGRAM is expected"<<endl;}
-		|	PROGRAM pname SEMICOLON error declist SEMICOLON BEGIN statlist END PERIOD {cout<<"VAR is expected"<<endl;}
-		|	PROGRAM pname SEMICOLON VAR declist SEMICOLON error statlist END PERIOD	{cout<<"BEGIN is expected"<<endl;}
-		|	PROGRAM pname SEMICOLON VAR declist SEMICOLON BEGIN statlist error PERIOD	{cout<<"END. is expected"<<endl;}
-		|	PROGRAM pname SEMICOLON VAR declist SEMICOLON BEGIN statlist END error	{cout<<". is missing"<<endl;}
-		|	PROGRAM pname error VAR declist SEMICOLON BEGIN statlist END PERIOD {cout<<"; is missing"<<endl;}
-		|	PROGRAM pname SEMICOLON VAR declist error BEGIN statlist END PERIOD {cout<<"; is missing"<<endl;}
+line	:	PROGRAM pname SEMICOLON error declist SEMICOLON BEGIN statlist END {cout<<"VAR is expected"<<endl; valid = false; ifValid();}
+		|	error pname SEMICOLON VAR declist SEMICOLON BEGIN statlist END		{cout<<"PROGRAM is expected"<<endl;  valid = false; ifValid();}
+		|	PROGRAM pname SEMICOLON VAR declist SEMICOLON error statlist END	{cout<<"BEGIN is expected"<<endl;  valid = false; ifValid();}
+		|	PROGRAM pname SEMICOLON VAR declist SEMICOLON BEGIN statlist error	{cout<<"END. is expected"<<endl;  valid = false;ifValid();}
+		|	PROGRAM pname error VAR declist SEMICOLON BEGIN statlist END {cout<<"; is missing"<<endl;  valid = false; ifValid();}
+		|	PROGRAM pname SEMICOLON VAR declist error BEGIN statlist END {cout<<"; is missing"<<endl;  valid = false; ifValid();}
+		|	PROGRAM pname SEMICOLON VAR declist SEMICOLON BEGIN statlist END {ifValid();}
 		;
 pname	:	identifier					{cout<<"Program name: "<< $1<<endl<<endl;}
-		|	error						{cout<<"UNKNOWN IDENTIFIER"<<endl;}
+		|	error						{cout<<"UNKNOWN IDENTIFIER"<<endl; valid = false;ifValid();}
 		;
 declist	:	dec COLON type				{;}
 		;
 dec		:	identifier COMMA dec		{;}
 		|	identifier					{;}
-		|	identifier error dec		{cout<<", is missing"<<endl;}
+		|	identifier error dec		{cout<<", is missing"<<endl; valid = false;ifValid();}
 		;
 
 statlist:	stat SEMICOLON				{;}
 		|	stat SEMICOLON statlist		{;}
-		| 	stat error statlist			{cout<<"; is missing"<<endl;}
-		|	stat error					{cout<<"; is missing"<<endl;}
+		| 	stat error statlist			{cout<<"; is missing"<<endl; valid = false;ifValid();}
+		|	stat error					{cout<<"; is missing"<<endl; valid = false;ifValid();}
 		;
 stat	:	print						{;}
 		|	assign						{;}
@@ -112,12 +113,12 @@ output	: expr							{tempStr=to_string($1);
 										$$=temP;
 										}
 		
-		| expr error output				{cout<<", is missing"<<endl;}
-		| STRING error expr				{cout<<", is missing"<<endl;}
+		| expr error output				{cout<<", is missing"<<endl; valid = false;ifValid();}
+		| STRING error expr				{cout<<", is missing"<<endl; valid = false;ifValid();}
 		;
 assign	:	identifier EQUAL expr		{updateTable($1,$3); cout<<"Assignment: "<<$1<<"="<<$3<<endl;}
-		|	identifier error expr		{cout<<"= is missing"<<endl;}
-		|	error EQUAL expr			{cout<<"UNKNOWN IDENTIFIER";}
+		|	identifier error expr		{cout<<"= is missing"<<endl; valid = false;ifValid();}
+		|	error EQUAL expr			{cout<<"UNKNOWN IDENTIFIER"; valid = false;ifValid();}
 		;
 expr	:	term						{$$ = $1;}
 		|	expr ADD term				{$$ = $1 + $3;}
@@ -132,7 +133,7 @@ factor	:	identifier					{$$ = symbolVal($1);}
 		|	number						{$$ = $1;}
 		;
 type	:	INTEGER						{;}
-		|	error						{cout<<"UNKNOWN IDENTIFIER";}
+		|	error						{cout<<"UNKNOWN IDENTIFIER"; valid = false;ifValid();}
 		;
 %%
 int main (void) {
@@ -158,4 +159,13 @@ int symbolVal(char * symbol)
 {
 	int bucket = hashh(symbol);
 	return symbols[bucket];
+}
+void ifValid(){
+	if(!alreadySmells){
+		alreadySmells = true;
+		if(valid){
+			cout<<endl<<"VALID LANGUAGE"<<endl;
+		}
+		else cout<<endl<<"INVALID LANGUAGE"<<endl;
+	}
 }
